@@ -25,8 +25,8 @@ plugin "docker" {
   }
 }
 advertise {
-  http = "{{ GetPrivateIP }}"
-  rpc  = "{{ GetPrivateIP }}"
-  serf = "{{ GetPrivateIP }}"
+  http = "172.20.0.11"
+  rpc  = "172.20.0.11"
+  serf = "172.20.0.11"
 }
 bind_addr = "0.0.0.0"

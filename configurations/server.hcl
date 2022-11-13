@@ -17,8 +17,8 @@ telemetry {
   publish_node_metrics       = true
 }
 advertise {
-  http = "{{ GetPrivateIP }}"
-  rpc  = "{{ GetPrivateIP }}"
-  serf = "{{ GetPrivateIP }}"
+  http = "172.20.0.5"
+  rpc  = "172.20.0.5"
+  serf = "172.20.0.5"
 }
 bind_addr = "0.0.0.0"

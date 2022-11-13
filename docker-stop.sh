@@ -2,4 +2,6 @@
 
 docker-compose down
 
-docker network rm public-kingpin
+docker volume prune
+docker system prune
+docker image prune

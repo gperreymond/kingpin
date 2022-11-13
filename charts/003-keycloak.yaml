@@ -31,10 +31,10 @@ envFromSecrets:
 # from nomad service
 envFromServices:
   - name: KC_DB_URL_HOST
-    source: keycloak-postgres
+    source: keycloak-postgres-tcp
     value: '{{ .Address }}'
   - name: KC_DB_URL_PORT
-    source: keycloak-postgres
+    source: keycloak-postgres-tcp
     value: '{{ .Port }}'
 
 deployment:

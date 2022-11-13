@@ -2,7 +2,7 @@
 
 job "{{ $Values.name }}" {
   region      = "{{ $Values.region }}"
-  datacenters = [{{ range $Values.datacenters }}"{{ . }}"{{ end }}]
+  datacenters = [{{ range $Values.datacenters }}"{{ . }}",{{ end }}]
   type        = "{{ $Values.type }}"
 
   group "{{ $Values.name }}" {
@@ -18,11 +18,13 @@ job "{{ $Values.name }}" {
       name     = "{{ $Values.name }}-{{ .name }}"
       port     = "{{ .port }}"
       provider = "nomad"
+      {{- with .tags }}
       tags = [
-        {{- range .tags }}
+        {{- range . }}
         "{{ . }}",
         {{- end }}
       ]
+      {{- end }}
     }
     {{- end }}
     task "{{ $Values.name }}" {
@@ -30,10 +32,10 @@ job "{{ $Values.name }}" {
       config {
         image = "{{ $Values.image.repository }}:{{ $Values.image.tag }}"
         privileged = true
-        ports = [{{ range $Values.services }}"{{ .name }}"{{ end }}]
+        ports = [{{ range $Values.services }}"{{ .name }}",{{ end }}]
         {{- with $Values.deployment.args }}
         args = [
-          {{- range $Values.deployment.args }}
+          {{- range . }}
           "{{ . }}",
           {{- end }}
         ]
@@ -44,18 +46,21 @@ job "{{ $Values.name }}" {
         env         = true
         change_mode = "restart"
         data        = <<EOF
+# classic key=value
 {{- range $key, $value := $Values.env }}
-{{ $key }}={{ $value }}
+{{ $key }}="{{ $value }}"
 {{- end }}
+# from nomad var
 {{- range $Values.envFromSecrets }}
-{{ printf "%s%s%s%s" `{{- with nomadVar "` .source `"` ` -}}` }}
-{{ .name }}={{ `{{ .value }}` }}
-{{ `{{- end -}}` }}
+{{ printf "%s%s%s%s" `{{- with nomadVar "` .source `"` ` }}` }}
+{{ .name }}="{{ `{{ .value }}` }}"
+{{ `{{- end }}` }}
 {{- end }}
+# from nomad service
 {{- range $Values.envFromServices }}
-{{ printf "%s%s%s%s" `{{- with nomadService "` .source `"` ` -}}` }}
-{{ .name }}={{ .value }}
-{{ `{{- end -}}` }}
+{{ printf "%s%s%s%s" `{{- range nomadService "` .source `"` ` }}` }}
+{{ .name }}="{{ .value }}"
+{{ `{{- end }}` }}
 {{- end }}
 EOF
       }

@@ -8,8 +8,11 @@ volumes:
 
 networks:
 
-  public-kingpin:
-    external: true
+  public:
+    name: public-kingpin
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
 
 services:
 
@@ -20,7 +23,8 @@ services:
     privileged: true
     command: ['nomad', 'agent', '-config=/nomad/config.hcl']
     networks:
-      - 'public-kingpin'
+      public:
+        ipv4_address: 172.20.0.5
     ports:
       - '4646:4646/tcp'
     volumes:
@@ -35,7 +39,8 @@ services:
     privileged: true
     command: ['nomad', 'agent', '-config=/nomad/config.hcl']
     networks:
-      - 'public-kingpin'
+      public:
+        ipv4_address: 172.20.0.11
     ports:
       - '80:80/tcp'
     volumes:

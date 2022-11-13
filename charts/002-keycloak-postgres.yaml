@@ -15,7 +15,7 @@ env:
   POSTGRES_USER: keycloak
 
 envFromSecrets:
-  - name: KC_DB_PASSWORD
+  - name: POSTGRES_PASSWORD
     source: secret/keycloak/postgres_password
 
 envFromServices: []
