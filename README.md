@@ -1,5 +1,7 @@
 # KINGPIN
 
+![KINGPIN LOGO](./logo.jpg)
+
 ## build image
 
 * APP_NOMAD_VERSION="1.4.2"
