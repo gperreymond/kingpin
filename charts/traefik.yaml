@@ -9,9 +9,13 @@ image:
   repository: traefik
   tag: v2.9.4
 
+env: []
+
 envFromSecrets:
-  - source: secret/global/nomad_address
-    target: TRAEFIK_PROVIDERS_NOMAD_ENDPOINT_ADDRESS
+  - name: TRAEFIK_PROVIDERS_NOMAD_ENDPOINT_ADDRESS
+    source: secret/global/nomad_address
+
+envFromServices: []
 
 deployment:
   replicas: 1

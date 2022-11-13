@@ -10,23 +10,33 @@
 $ docker build -f Dockerfile.runner -t kingpin-runner:1.0.0 .
 ```
 
+## nomad server / client from docker-compose
+
+```sh
+$ ./docker-start.sh
+$ ./docker-stop.sh
+```
+
 ## runner usages
 
 ```sh
-# terraform usage
-$ ./terraform apply /local/infra
 # nomad usage
 $ ./nomad job run /local/traefik.hcl
-$ ./nomad var put secret/global nomad_address=http://192.168.208.2:4646
+$ ./nomad var put -force secret/global/nomad_address value=http://192.168.208.2:4646
 ```
 
-## gomplate usages
+## how to deploy ?
+
+* create nomad variables as secrets
+* create nomad hcl files
+* deploy nomad jobs
 
 ```sh
-$ cat charts/traefik.yaml | gomplate --datasource config=stdin:///in.yaml --file templates/deployment.nomad.tpl
+# just one script
+$ ./all-in-one.sh
 ```
 
-## documentations
+## documentations
 
 * https://docs.gomplate.ca/usage
 * https://mpolinowski.github.io/docs/DevOps/Hashicorp/2021-08-07--hashicorp-nomad-job-configuration/2021-08-07

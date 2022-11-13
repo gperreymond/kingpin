@@ -42,9 +42,17 @@ job "{{ $Values.name }}" {
         env         = true
         change_mode = "restart"
         data        = <<EOF
+{{- range $key, $value := $Values.env }}
+{{ $key }}={{ $value }}
+{{- end }}
 {{- range $Values.envFromSecrets }}
 {{ printf "%s%s%s%s" `{{- with nomadVar "` .source `"` ` -}}` }}
-{{ .target }}={{ `{{ .value }}` }}
+{{ .name }}={{ `{{ .value }}` }}
+{{ `{{- end -}}` }}
+{{- end }}
+{{- range $Values.envFromServices }}
+{{ printf "%s%s%s%s" `{{- with nomadService "` .source `"` ` -}}` }}
+{{ .name }}={{ .value }}
 {{ `{{- end -}}` }}
 {{- end }}
 EOF

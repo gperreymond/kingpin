@@ -1,0 +1,56 @@
+name: keycloak
+region: localhost
+datacenters:
+  - kingpin
+namespace: default
+type: service
+
+image:
+  repository: 'quay.io/keycloak/keycloak'
+  tag: '19.0.3'
+
+# classic key=value
+env:
+  KC_DB_USERNAME: keycloak
+  KC_DB_SCHEMA: public
+  KC_DB_URL_DATABASE: keycloak
+  KEYCLOAK_ADMIN: admin
+  KC_PROXY: edge
+  PROXY_ADDRESS_FORWARDING: 'true'
+  KC_HOSTNAME_STRICT: 'false'
+  KC_HTTP_ENABLED: 'true'
+  KC_METRICS_ENABLED: 'true'
+
+# from nomad var
+envFromSecrets:
+  - name: KC_DB_PASSWORD
+    source: secret/keycloak/postgres_password
+  - name: KEYCLOAK_ADMIN_PASSWORD
+    source: secret/keycloak/admin_password
+
+# from nomad service
+envFromServices:
+  - name: KC_DB_URL_HOST
+    source: keycloak-postgres
+    value: '{{ .Address }}'
+  - name: KC_DB_URL_PORT
+    source: keycloak-postgres
+    value: '{{ .Port }}'
+
+deployment:
+  replicas: 1
+  args: ['start-dev']
+  resources:
+    cpu: 1000
+    memory: 2048
+
+services:
+  - name: http
+    type: to
+    port: 8080
+    tags:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.traefik.rule=Host(`auth.docker.localhost`)'
+      - 'traefik.http.routers.traefik.service=api@internal'
+      - 'traefik.http.services.traefik.loadbalancer.server.scheme=http'
+      - 'traefik.http.services.traefik.loadbalancer.server.port=$${NOMAD_HOST_PORT_http}'
