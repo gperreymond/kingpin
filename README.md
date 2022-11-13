@@ -48,6 +48,6 @@ $ ./all-in-one.sh
 ## documentations
 
 * https://docs.gomplate.ca/usage
-* https://mpolinowski.github.io/docs/DevOps/Hashicorp/2021-08-07--hashicorp-nomad-job-configuration/2021-08-07
+* https://mpolinowski.github.io/docs/category/hashicorp
 * https://developer.hashicorp.com/nomad/docs/runtime/environment
 * https://developer.hashicorp.com/nomad/docs/job-specification/template#environment-variables
