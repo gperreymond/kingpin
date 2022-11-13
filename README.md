@@ -2,7 +2,6 @@
 
 ## build image
 
-* APP_TERRAFORM_VERSION="1.3.4"
 * APP_NOMAD_VERSION="1.4.2"
 * APP_CNI_PLUGINS_VERSION="1.1.1"
 
@@ -21,11 +20,21 @@ $ ./docker-stop.sh
 
 ```sh
 # nomad usage
-$ ./nomad job run /local/traefik.hcl
-$ ./nomad var put -force secret/global/nomad_address value=http://192.168.208.2:4646
+$ ./nomad system gc
+$ ./nomad server members
 ```
 
-## how to deploy ?
+## generate random password
+
+This script will generate a random password and add it to nomad variables as secrets.
+
+```sh
+$ ./generate-password.sh --source secret/keycloak --name postgres_password
+# force replacement
+$ ./generate-password.sh --source secret/keycloak --name postgres_password --force
+```
+
+## deploy all jobs
 
 * create nomad variables as secrets
 * create nomad hcl files

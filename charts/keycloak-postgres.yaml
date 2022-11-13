@@ -18,8 +18,11 @@ envFromSecrets:
   - name: KC_DB_PASSWORD
     source: secret/keycloak/postgres_password
 
+envFromServices: []
+
 deployment:
   replicas: 1
+  args: []
   resources:
     cpu: 200
     memory: 512

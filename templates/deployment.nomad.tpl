@@ -30,12 +30,14 @@ job "{{ $Values.name }}" {
       config {
         image = "{{ $Values.image.repository }}:{{ $Values.image.tag }}"
         privileged = true
-        ports = ["http", "metrics"]
+        ports = [{{ range $Values.services }}"{{ .name }}"{{ end }}]
+        {{- with $Values.deployment.args }}
         args = [
           {{- range $Values.deployment.args }}
           "{{ . }}",
           {{- end }}
         ]
+        {{- end }}
       }
       template {
         destination = "${NOMAD_SECRETS_DIR}/env.vars"
