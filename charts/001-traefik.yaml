@@ -1,58 +1,59 @@
-name: traefik
-region: localhost
+name: 'traefik'
+region: 'localhost'
 datacenters:
-  - kingpin
-namespace: default
-type: system
+  - 'kingpin'
+namespace: 'default'
+type: 'service'
 
 image:
-  repository: traefik
-  tag: v2.9.4
+  repository: 'traefik'
+  tag: 'v2.9.4'
 
-# trefik issue: if one env vars, then no args, all must be env vars
-env:
-  TRAEFIK_LOG_LEVEL: INFO
-  TRAEFIK_LOG_FORMAT: json
-  TRAEFIK_ACCESSLOG: 'true'
-  TRAEFIK_ACCESSLOG_FORMAT: json
-  TRAEFIK_PROVIDERS_NOMAD: 'true'
-  TRAEFIK_PROVIDERS_NOMAD_EXPOSEDBYDEFAULT: 'false'
-  TRAEFIK_PROVIDERS_NOMAD_ENDPOINT_REGION: localhost
-  TRAEFIK_PROVIDERS_NOMAD_NAMESPACE: default
-  TRAEFIK_PING: 'true'
-  TRAEFIK_PING_ENTRYPOINT: web
-  TRAEFIK_API_INSECURE: 'true'
-  TRAEFIK_METRICS_PROMETHEUS: 'true'
-  TRAEFIK_METRICS_PROMETHEUS_ENTRYPOINT: metrics
-  TRAEFIK_ENTRYPOINTS_WEB_ADDRESS: ':80'
-  TRAEFIK_ENTRYPOINTS_WEB_FORWARDEDHEADERS_INSECURE: 'true'
-  TRAEFIK_ENTRYPOINTS_METRICS_ADDRESS: ':8082'
-
-envFromSecrets:
-  - name: TRAEFIK_PROVIDERS_NOMAD_ENDPOINT_ADDRESS
-    source: secret/global/nomad_address
-
+# classic key=value
+env: []
+# from nomad var
+envFromSecrets: []
+# from nomad service
 envFromServices: []
 
 deployment:
   replicas: 1
-  args: []
+  args:
+    - '--global.sendAnonymousUsage=false'
+    - '--log.level=DEBUG'
+    - '--log.format=json'
+    - '--ping=true'
+    - '--ping.entryPoint=web'
+    - '--api.dashboard=true'
+    - '--api.insecure=true'
+    - '--entrypoints.web.address=:80'
+    - '--entryPoints.web.forwardedHeaders.insecure=true'
+    - '--entryPoints.metrics.address=:8082'
+    - '--providers.nomad=true'
+    - '--providers.nomad.exposedByDefault=false'
+    - '--providers.nomad.endpoint.address=http://${NOMAD_IP_http}:4646'
+    - '--metrics.prometheus=true'
+    - '--metrics.prometheus.entryPoint=metrics'
+    - '--accesslog=true'
+    - '--accesslog.format=json'
+    - '--accesslog.fields.defaultmode=keep'
+    - '--accesslog.fields.headers.defaultmode=keep'
   resources:
     cpu: 100
     memory: 128
 
 services:
-  - name: http
-    type: static
+  - name: 'http'
+    type: 'static'
     port: 80
     tags:
       - 'traefik.enable=true'
       - 'traefik.http.routers.traefik.rule=Host(`traefik.docker.localhost`)'
       - 'traefik.http.routers.traefik.service=api@internal'
       - 'traefik.http.services.traefik.loadbalancer.server.scheme=http'
-      - 'traefik.http.services.traefik.loadbalancer.server.port=80'
-  - name: metrics
-    type: to
+      - 'traefik.http.services.traefik.loadbalancer.server.port=${NOMAD_HOST_PORT_http}'
+  - name: 'metrics'
+    type: 'to'
     port: 8082
     tags: []
     

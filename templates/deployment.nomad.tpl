@@ -3,6 +3,7 @@
 job "{{ $Values.name }}" {
   region      = "{{ $Values.region }}"
   datacenters = [{{ range $Values.datacenters }}"{{ . }}",{{ end }}]
+  namespace = "{{ $Values.namespace }}"
   type        = "{{ $Values.type }}"
 
   group "{{ $Values.name }}" {
@@ -16,8 +17,8 @@ job "{{ $Values.name }}" {
     {{- range $Values.services }}
     service {
       name     = "{{ $Values.name }}-{{ .name }}"
-      port     = "{{ .port }}"
       provider = "nomad"
+      port     = "{{ .name }}"
       {{- with .tags }}
       tags = [
         {{- range . }}

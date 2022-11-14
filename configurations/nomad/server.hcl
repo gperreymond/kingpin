@@ -1,11 +1,11 @@
-region = "localhost"
+region     = "localhost"
 datacenter = "kingpin"
-data_dir = "/opt/nomad/data"
-name = "node-server"
-log_level = "INFO"
-log_json = true
+data_dir   = "/opt/nomad/data"
+name       = "node-server"
+log_level  = "INFO"
+log_json   = true
 server {
-  enabled = true
+  enabled          = true
   bootstrap_expect = 1
 }
 client {
@@ -17,8 +17,8 @@ telemetry {
   publish_node_metrics       = true
 }
 advertise {
-  http = "172.20.0.5"
-  rpc  = "172.20.0.5"
-  serf = "172.20.0.5"
+  http = "172.20.0.10"
+  rpc  = "172.20.0.10"
+  serf = "172.20.0.10"
 }
 bind_addr = "0.0.0.0"

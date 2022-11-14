@@ -14,7 +14,10 @@ $ docker build -f Dockerfile.runner -t kingpin-runner:1.0.0 .
 ## nomad server / client from docker-compose
 
 ```sh
+# to start
 $ ./docker-start.sh
+$ docker exec -it nomad-client service docker start
+# to stop
 $ ./docker-stop.sh
 ```
 
@@ -49,6 +52,7 @@ $ ./all-in-one.sh
 
 ## documentations
 
+* https://doc.traefik.io/traefik/reference/static-configuration/env/
 * https://docs.gomplate.ca/usage
 * https://mpolinowski.github.io/docs/category/hashicorp
 * https://developer.hashicorp.com/nomad/docs/runtime/environment
