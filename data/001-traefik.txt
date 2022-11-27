@@ -1,22 +1,15 @@
-name: 'traefik'
-region: 'localhost'
-datacenters:
-  - 'kingpin'
-namespace: 'default'
-type: 'service'
+global:
+  name: 'traefik'
+  region: 'localhost'
+  datacenter: 'kingpin'
+  namespace: 'default'
+  baseUrl: 'docker.localhost'
 
-image:
-  repository: 'traefik'
-  tag: 'v2.9.4'
-
-# classic key=value
-env: []
-# from nomad var
-envFromSecrets: []
-# from nomad service
-envFromServices: []
-
-deployment:
+controller:
+  type: 'service'
+  image:
+    repository: 'traefik'
+    tag: 'v2.9.4'
   replicas: 1
   args:
     - '--global.sendAnonymousUsage=false'
@@ -46,14 +39,11 @@ services:
   - name: 'http'
     type: 'static'
     port: 80
-    tags:
-      - 'traefik.enable=true'
-      - 'traefik.http.routers.traefik.rule=Host(`traefik.docker.localhost`)'
-      - 'traefik.http.routers.traefik.service=api@internal'
-      - 'traefik.http.services.traefik.loadbalancer.server.scheme=http'
-      - 'traefik.http.services.traefik.loadbalancer.server.port=${NOMAD_HOST_PORT_http}'
+    ingress:
+      enabled: true
+      prefix: 'traefik'
   - name: 'metrics'
-    type: 'to'
     port: 8082
-    tags: []
+    ingress:
+      enabled: false
     

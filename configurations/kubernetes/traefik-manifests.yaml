@@ -1,0 +1,86 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: nomad-server-http
+  namespace: nomad-system
+spec:
+  entryPoints:
+    - nomad-server-http
+  routes:
+  - match: HostSNI(`*`)
+    services:
+    - name: nomad-server
+      namespace: nomad-system
+      port: 4646
+  tls:
+    passthrough: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: nomad-server-rpc
+  namespace: nomad-system
+spec:
+  entryPoints:
+    - nomad-server-rpc
+  routes:
+  - match: HostSNI(`*`)
+    services:
+    - name: nomad-server
+      namespace: nomad-system
+      port: 4647
+  tls:
+    passthrough: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: nomad-server-serf
+  namespace: nomad-system
+spec:
+  entryPoints:
+    - nomad-server-serf-tcp
+  routes:
+  - match: HostSNI(`*`)
+    services:
+    - name: nomad-server
+      namespace: nomad-system
+      port: 4648
+  tls:
+    passthrough: true
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteUDP
+metadata:
+  name: nomad-server-serf
+  namespace: nomad-system
+spec:
+  entryPoints:
+    - nomad-server-serf-udp
+  routes:
+  - services:
+    - name: nomad-server
+      namespace: nomad-system
+      port: 4648
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kuma-http
+  namespace: kuma-system
+spec:
+  entryPoints:
+    - web
+  routes:  
+  - kind: Rule
+    match: Host(`kuma.docker.localhost`)
+    services:  
+      - kind: Service
+        name: kuma-control-plane
+        namespace: kuma-system
+        port: 5681
+        scheme: http

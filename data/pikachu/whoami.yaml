@@ -1,0 +1,23 @@
+global:
+  name: 'whoami'
+  region: 'europe-paris'
+  datacenter: 'infra'
+  namespace: 'pikachu'
+  baseUrl: 'docker.localhost'
+
+controller:
+  type: 'service'
+  image:
+    repository: 'containous/whoami'
+    tag: 'latest'
+  replicas: 1
+  resources:
+    cpu: 100
+    memory: 64
+
+mesh:
+  enabled: true
+
+services:
+  - name: 'http'
+    port: 80

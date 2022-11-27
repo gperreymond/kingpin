@@ -1,0 +1,134 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nomad-system
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nomad
+  namespace: nomad-system
+data:
+  server.hcl: |
+    region     = "europe-paris"
+    datacenter = "infra"
+    data_dir   = "/opt/nomad/data"
+    name       = "node-server"
+    log_level  = "INFO"
+    log_json   = true
+    server {
+      enabled          = true
+      bootstrap_expect = 1
+    }
+    client {
+      enabled = false
+    }
+    telemetry {
+      prometheus_metrics         = true
+      publish_allocation_metrics = true
+      publish_node_metrics       = true
+    }
+    advertise {
+      http = "{{ GetPrivateIP }}:4646"
+      rpc  = "{{ GetPrivateIP }}:4647"
+      serf = "{{ GetPrivateIP }}:4648"
+    }
+    bind_addr = "0.0.0.0"
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nomad-server
+  namespace: nomad-system
+spec:
+  serviceName: nomad-server
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nomad-server
+  template:
+    metadata:
+      labels:
+        app: nomad-server
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - nomad-server
+              topologyKey: kubernetes.io/hostname
+      containers:
+        - name: nomad
+          image: multani/nomad:1.4.3
+          args:
+            - "agent"
+            - "-config=/etc/nomad/nomad.d/server.hcl"
+          ports:
+            - name: http
+              containerPort: 4646
+              protocol: "TCP"
+            - name: rpc
+              containerPort: 4647
+              protocol: "TCP"
+            - name: serf-tcp
+              containerPort: 4648
+              protocol: "TCP"
+            - name: serf-udp
+              containerPort: 4648
+              protocol: "UDP"
+          resources:
+            requests:
+              cpu: '500m'
+              memory: '1Gi'
+          volumeMounts:
+            - name: nomad-config
+              mountPath: /etc/nomad/nomad.d
+            - name: nomad-data
+              mountPath: /var/lib/nomad
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        fsGroup: 1000
+      volumes:
+        - name: nomad-config
+          configMap:
+            name: nomad
+  volumeClaimTemplates:
+    - metadata:
+        name: nomad-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nomad-server
+  namespace: nomad-system
+  labels:
+    name: nomad-server
+spec:
+  ports:
+    - name: http
+      port: 4646
+      protocol: "TCP"
+    - name: rpc
+      port: 4647
+      protocol: "TCP"
+    - name: serf-tcp
+      port: 4648
+      protocol: "TCP"
+    - name: serf-udp
+      port: 4648
+      protocol: "UDP"
+  selector:
+    app: nomad-server

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+rm -rf local
+
+files=data/*.yaml
+for file in $files; do
+    filename=$(basename $file .yaml)
+    echo "... $file => local/$filename.nomad.hcl"
+    ./bin/levant render -var-file=$file templates/deployment.nomad.hcl
+done

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+rm -rf "local"
+mkdir "local"
+
+# -----------------------------------------------
+echo "[INFO] create nomad variables as secrets"
+# -----------------------------------------------
+
+./scripts/generate-password --source secret/keycloak --name postgres_password
+./scripts/generate-password --source secret/keycloak --name admin_password
+
+# -----------------------------------------------
+echo "[INFO] create nomad namespaces"
+# -----------------------------------------------
+
+./bin/nomad namespace apply "nomad-system"
+./bin/nomad namespace apply "evoli"
+./bin/nomad namespace apply "pikachu"
+
+# -----------------------------------------------
+echo "[INFO] render nomad jobs"
+# -----------------------------------------------
+
+./bin/levant render -var-file=data/000-kuma.yaml templates/deployment.nomad.hcl > local/kuma.nomad.hcl
+
+mkdir -p local/evoli
+./bin/levant render -var-file=data/evoli/whoami.yaml templates/deployment.nomad.hcl > local/evoli/whoami.nomad.hcl
+
+mkdir -p local/pikachu
+./bin/levant render -var-file=data/pikachu/whoami.yaml templates/deployment.nomad.hcl > local/pikachu/whoami.nomad.hcl

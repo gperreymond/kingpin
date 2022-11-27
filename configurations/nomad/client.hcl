@@ -1,6 +1,6 @@
-region     = "localhost"
-datacenter = "kingpin"
-data_dir   = "/opt/nomad/data"
+region     = "europe-paris"
+datacenter = "infra"
+data_dir   = "/tmp/nomad/data"
 name       = "node-client"
 log_level  = "INFO"
 log_json   = true
@@ -10,9 +10,14 @@ server {
 client {
   enabled = true
   server_join {
-    retry_join     = ["nomad-server"]
+    retry_join     = ["192.168.49.20"]
     retry_max      = 3
     retry_interval = "15s"
+  }
+  meta {
+    region      = "europe-paris"
+    datacenter  = "infra"
+    namespace   = "danone-bucharest"
   }
 }
 plugin "docker" {
@@ -25,8 +30,8 @@ plugin "docker" {
   }
 }
 advertise {
-  http = "172.20.0.15"
-  rpc  = "172.20.0.15"
-  serf = "172.20.0.15"
+  http = "{{ GetPrivateIP }}:4646"
+  rpc  = "{{ GetPrivateIP }}:4647"
+  serf = "{{ GetPrivateIP }}:4648"
 }
 bind_addr = "0.0.0.0"

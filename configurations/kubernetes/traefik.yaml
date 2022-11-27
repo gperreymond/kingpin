@@ -1,0 +1,22 @@
+metrics:
+  prometheus:
+    addEntryPointsLabels: false
+    addServicesLabels: false
+
+ports:
+  traefik:
+    expose: true
+  websecure:
+    expose: false
+
+logs:
+  general:
+    level: INFO
+
+additionalArguments:
+  - "--api.insecure=true"
+  - "--log.format=json"
+  - "--entrypoints.nomad-server-http.address=:4646/tcp"
+  - "--entrypoints.nomad-server-rpc.address=:4647/tcp"
+  - "--entrypoints.nomad-server-serf-tcp.address=:4648/tcp"
+  - "--entrypoints.nomad-server-serf-udp.address=:4648/udp"
