@@ -1,0 +1,10 @@
+apiVersion: 'metronlab.com/v1alpha1'
+kind: 'NomadJob'
+metadata:
+  name: 'whoami'
+  namespace: 'kingpin'
+spec:
+  region: 'europe-stockholm'
+  datacenter: 'infra'
+  namespace: 'kingpin'
+  type: 'service'

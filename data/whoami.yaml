@@ -1,23 +1,23 @@
 global:
   name: 'whoami'
-  region: 'europe-paris'
+  region: 'europe-stockholm'
   datacenter: 'infra'
-  namespace: 'pikachu'
-  baseUrl: 'docker.localhost'
+  namespace: 'kingpin'
+  dns:
+    zone: 'metronlab.eu'
 
 controller:
   type: 'service'
   image:
-    repository: 'containous/whoami'
-    tag: 'latest'
+    repository: 'traefik/whoami'
+    tag: 'v1.8.7'
   replicas: 1
   resources:
     cpu: 100
     memory: 64
 
-mesh:
-  enabled: true
-
 services:
   - name: 'http'
     port: 80
+    ingress:
+      enabled: true
